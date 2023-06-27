@@ -332,7 +332,7 @@
             editorAPI.components.add(firstSection, getComp(url, props), [])
         })
     }
-    const installExample = async (example, {}) => {
+    const _installExample = async (example, {onePage}) => {
         const editorAPI = window.editorAPI
 
         if (!editorAPI.wixCode.isLoaded()) {
@@ -344,7 +344,6 @@
 
         const {dependencies} = await editorAPI.wixCode.codePackages.getNpmPkgs()
 
-        // add node modules
         example.npm_module.forEach(([name, version]) => {
             if (!dependencies[name]) {
                 editorAPI.wixCode.codePackages.installNpmPkg(name, version)
@@ -353,19 +352,17 @@
 
         console.log('install BYOC: 2. node modules added')
 
-
-
-        // console.log('install BYOC: 3. folder created')
-
         await addFiles(example)
 
         console.log('install BYOC: 4. files added ')
 
-        // create new page and wait
-        // todo
-
-        addComponents(example)
-        console.log('install BYOC: 5. components added')
+        if (onePage) {
+            addComponents(example)
+            console.log('install BYOC: 5. components added')
+        } else {
+            addPages(example)
+            console.log('install BYOC: 6. pages added')
+        }
     }
 
     const addPages = (example) => {
@@ -380,12 +377,14 @@
         })
     }
 
+    const installExampleOnePage = (example) => _installExample(example, {onePage: true})
+    const installExample = (example) => _installExample(example, {onePage: false})
+
     window.responsiveBYOC = {
         installExample,
+        installExampleOnePage,
         addComponents,
         addPages,
         addFiles
     }
-
-
 })();
